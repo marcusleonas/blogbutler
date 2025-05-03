@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/marcusleonas/blogbutler/internal/config"
+	"github.com/marcusleonas/blogbutler/internal/utils"
 	"github.com/spf13/cobra"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -140,6 +141,22 @@ var buildCommand = &cobra.Command{
 			defer outFile.Close()
 
 			log.Printf("Successfully built post '%s'.\n", post.Name())
+		}
+
+		err = os.Mkdir("dist/public", 0755)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// copy public assets
+		_, err = os.Stat("public")
+		if err == nil {
+			err = utils.CopyDirectory("public", path.Join("dist", "public"))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		}
 
 		log.Println("Successfully built all posts.")
