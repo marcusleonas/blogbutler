@@ -8,6 +8,7 @@ var HomeTemplate = `{{ define "content" }}
 {{ end }}`
 
 var PostsTemplate = `{{ define "content" }}
+<a href="/">Back to home</a>
 <h1>{{ .PostTitle }}</h1>
 {{ .PostContent }}
 {{ end }}`
