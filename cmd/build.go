@@ -57,6 +57,12 @@ var buildCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
+		err = os.Mkdir("dist/posts", 0755)
+		if err != nil {
+			fmt.Println("Failed to create dist folder.")
+			os.Exit(1)
+		}
+
 		md := goldmark.New(
 			goldmark.WithExtensions(
 				extension.GFM,
@@ -68,9 +74,16 @@ var buildCommand = &cobra.Command{
 			),
 		)
 
+		type Post struct {
+			PostTitle string
+			PostPath  string
+		}
+
+		var postsWithMeta []Post
+
 		posts, _ := os.ReadDir("posts")
 		for _, post := range posts {
-			if post.IsDir() || !strings.HasSuffix(post.Name(), ".md") {
+			if post.IsDir() || !strings.HasSuffix(post.Name(), ".md") || post.Name() == "index.md" {
 				continue
 			}
 
@@ -107,7 +120,6 @@ var buildCommand = &cobra.Command{
 			postTemplate := "templates/post.html"
 
 			outputFilename := strings.Trim(post.Name(), ".md")
-			outputFilepath := path.Join("dist", outputFilename+".html")
 
 			tmpl, err := template.ParseFiles(layoutTemplate, postTemplate)
 			if err != nil {
@@ -127,7 +139,7 @@ var buildCommand = &cobra.Command{
 				Copyright:   config.Site.Copyright,
 			}
 
-			outFile, err := os.Create(outputFilepath)
+			outFile, err := os.Create(path.Join("dist", "posts", outputFilename+".html"))
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -140,6 +152,11 @@ var buildCommand = &cobra.Command{
 			}
 			defer outFile.Close()
 
+			postsWithMeta = append(postsWithMeta, Post{
+				PostTitle: meta.Title,
+				PostPath:  "/posts/" + outputFilename,
+			})
+
 			log.Printf("Successfully built post '%s'.\n", post.Name())
 		}
 
@@ -148,6 +165,42 @@ var buildCommand = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		// render index page
+		indexOutputFilename := "index.html"
+
+		tmpl, err := template.ParseFiles("templates/layout.html", "templates/index.html")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		data := struct {
+			PostTitle string
+			SiteTitle string
+			Posts     []Post
+			Copyright string
+		}{
+			PostTitle: "Home",
+			SiteTitle: config.Site.Title,
+			Posts:     postsWithMeta,
+			Copyright: config.Site.Copyright,
+		}
+
+		outFile, err := os.Create(path.Join("dist", indexOutputFilename))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		err = tmpl.ExecuteTemplate(outFile, "layout", data)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		defer outFile.Close()
+
+		log.Printf("Successfully built index page '%s'.\n", indexOutputFilename)
 
 		// copy public assets
 		_, err = os.Stat("public")

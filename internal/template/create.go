@@ -26,5 +26,12 @@ func CreateTemplates(folderName string) error {
 	}
 	defer PostTemplate.Close()
 	PostTemplate.WriteString(PostsTemplate)
+
+	IndexTemplate, err := os.Create(path.Join(folderName, "templates", "index.html"))
+	if err != nil {
+		return err
+	}
+	defer IndexTemplate.Close()
+	IndexTemplate.WriteString(HomeTemplate)
 	return nil
 }

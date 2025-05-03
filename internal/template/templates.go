@@ -2,11 +2,14 @@ package template
 
 var HomeTemplate = `{{ define "content" }}
 <h1>{{ .SiteTitle }}</h1>
+{{ range .Posts }}
+<a href="{{ .PostPath }}">{{ .PostTitle }}</a>
+{{ end }}
 {{ end }}`
 
 var PostsTemplate = `{{ define "content" }}
 <h1>{{ .PostTitle }}</h1>
-<div id="content">{{ .PostContent }}</p>
+{{ .PostContent }}
 {{ end }}`
 
 var LayoutTemplate = `{{ define "layout" }}
@@ -22,7 +25,7 @@ var LayoutTemplate = `{{ define "layout" }}
         {{ template "content" . }}
     </main>
     <footer class="footer">
-        <p>&copy; {{ .Copyright }}</p>
+        <p>{{ .Copyright }}</p>
     </footer>
 </body>
 </html>
