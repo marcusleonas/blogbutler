@@ -164,6 +164,7 @@ var buildCommand = &cobra.Command{
 				Author:      meta.Author,
 				Date:        meta.Date,
 				Description: meta.Description,
+				Content:     string(htmlOutput),
 			})
 
 			log.Printf("Successfully built post '%s'.\n", post.Name())

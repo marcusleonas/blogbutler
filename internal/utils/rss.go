@@ -15,6 +15,7 @@ type Post struct {
 	Author      string
 	Date        string
 	Description string
+	Content     string
 }
 
 // RSS is the root element
@@ -39,13 +40,14 @@ type Channel struct {
 
 // Item represents a single entry in the feed
 type Item struct {
-	XMLName     xml.Name `xml:"item"`
-	Title       string   `xml:"title"`       // Post Title
-	Link        string   `xml:"link"`        // Full URL to the post
-	Description string   `xml:"description"` // Post Description (Placeholder)
-	Author      string   `xml:"author"`      // Optional: email (author@example.com (Name)) (Placeholder)
-	PubDate     string   `xml:"pubDate"`     // Post publication date (RFC1123Z format) (Placeholder)
-	Guid        Guid     `xml:"guid"`        // Unique identifier for the item
+	XMLName        xml.Name `xml:"item"`
+	Title          string   `xml:"title"`           // Post Title
+	Link           string   `xml:"link"`            // Full URL to the post
+	Description    string   `xml:"description"`     // Post Description (Placeholder)
+	Author         string   `xml:"author"`          // Optional: email (author@example.com (Name)) (Placeholder)
+	PubDate        string   `xml:"pubDate"`         // Post publication date (RFC1123Z format) (Placeholder)
+	Guid           Guid     `xml:"guid"`            // Unique identifier for the item
+	ContentEncoded string   `xml:"content:encoded"` // The actual Guid value (often the link)
 }
 
 // Guid represents the globally unique identifier for an item
@@ -94,6 +96,7 @@ func GenerateRSS(posts []Post, baseURL, channelTitle, channelDescription string)
 				IsPermaLink: "true", // Assume the link is a permalink
 				Value:       fullPostURL,
 			},
+			ContentEncoded: post.Content,
 		}
 		channel.Items = append(channel.Items, item)
 	}
