@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/marcusleonas/blogbutler/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -31,13 +32,11 @@ var initCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
-		f, err := os.Create(path.Join(folderName, "config.toml"))
-		defer f.Close()
-
-		f.WriteString(fmt.Sprintf(`# docs: https://github.com/marcusleonas/blogbutler/wiki
-[site]
-title="%s"
-post_folder="posts"`, folderName))
+		err = config.CreateConfig(folderName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 		fmt.Printf("Successfully initialised in `%s`", folderName)
 	},
