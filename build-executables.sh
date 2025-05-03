@@ -5,10 +5,15 @@ if [[ -z "$package" ]]; then
   echo "usage: $0 <package-name>"
   exit 1
 fi
-package_split=(${package//\// })
-package_name=${package_split[-1]}
-    
+package_name="blogbutler"
+dist_dir="dist"
+
+rm -rf "$dist_dir"
+mkdir "$dist_dir"
+
 platforms=("windows/amd64" "darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
+
+echo "Building executables..."
 
 for platform in "${platforms[@]}"
 do
@@ -18,11 +23,15 @@ do
     output_name=$package_name'-'$GOOS'-'$GOARCH
     if [ $GOOS = "windows" ]; then
         output_name+='.exe'
-    fi    
+    fi
 
-    env GOOS=$GOOS GOARCH=$GOARCH go build -o $output_name $package
+    output_path="$dist_dir/$output_name"
+
+    env GOOS=$GOOS GOARCH=$GOARCH go build -o "$output_path" $package
     if [ $? -ne 0 ]; then
            echo 'An error has occurred! Aborting the script execution...'
         exit 1
     fi
+
+    echo "Built $output_path"
 done
