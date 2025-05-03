@@ -5,6 +5,7 @@ templates, and more. Also has a serve command using go's build in file server.
 ## Todo
 
 - [x] Add init command
-- [ ] Add build command
-- [ ] Add customisable templates
-- [ ] Add build styles
+- [x] Add build command
+- [x] Add customisable templates
+- [x] Add build styles - add link tag to layout
+- [ ] Add serve command
