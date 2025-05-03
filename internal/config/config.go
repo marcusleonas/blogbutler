@@ -20,7 +20,8 @@ type Config struct {
 }
 
 const configFileName = "config.toml"
-const defaultConfigContent = `[site]
+const defaultConfigContent = `# docs: https://github.com/marcusleonas/blogbutler/wiki
+[site]
 title = "My Default Blog Title"
 post_folder = "posts"
 copyright = "© 2025 Your Name Here"
