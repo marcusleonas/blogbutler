@@ -178,7 +178,7 @@ var buildCommand = &cobra.Command{
 		// render index page
 		indexOutputFilename := "index.html"
 
-		tmpl, err := template.ParseFiles("templates/layout.html", "templates/index.html")
+		tmpl, err := template.ParseFiles("templates/layout.html", "templates/home.html")
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
