@@ -77,3 +77,11 @@ func LoadConfig() Config {
 	}
 	return conf
 }
+
+func ConfigExists() bool {
+	_, err := os.Stat(configFileName)
+	if err != nil {
+		return false
+	}
+	return true
+}
