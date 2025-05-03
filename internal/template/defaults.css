@@ -1,0 +1,116 @@
+:root {
+    --muted: #c3c3c3;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    background-color: #131313;
+    color: #fff;
+}
+
+body {
+    font-family: sans-serif;
+    max-width: 700px;
+    margin: auto;
+    padding: 2rem 0;
+}
+
+pre {
+    padding: 1rem;
+    background-color: #262626;
+    color: #fff;
+    border-radius: 10px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 2rem;
+}
+h2 {
+    font-size: 1.5rem;
+}
+h3 {
+    font-size: 1.25rem;
+}
+h4 {
+    font-size: 1.125rem;
+}
+h5 {
+    font-size: 1rem;
+}
+h6 {
+    font-size: 0.875rem;
+}
+
+a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--muted);
+}
+
+blockquote {
+    border-left: 4px solid var(--muted);
+    padding-left: 1rem;
+    margin-left: 1rem;
+}
+
+ul, ol {
+    padding-left: 1rem;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+table, th, td {
+    border: 1px solid #dee2e6;
+}
+th, td {
+    padding: 0.75rem;
+    vertical-align: top;
+}
+th {
+    background-color: #e9ecef;
+}  
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+footer {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+footer a, footer p {
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+    line-height: normal;
+}
+
+@media only screen and (max-width: 700px) {
+    body {
+        padding: 2rem 1rem;
+    }
+    footer {
+        flex-direction: column;
+    }
+}

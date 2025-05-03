@@ -9,10 +9,12 @@ import (
 	"path"
 	"strings"
 
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/marcusleonas/blogbutler/internal/config"
 	"github.com/marcusleonas/blogbutler/internal/utils"
 	"github.com/spf13/cobra"
 	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
@@ -68,18 +70,19 @@ var buildCommand = &cobra.Command{
 				extension.GFM,
 				extension.Footnote,
 				&frontmatter.Extender{},
+				highlighting.NewHighlighting(
+					highlighting.WithStyle("monokai"),
+					highlighting.WithFormatOptions(
+						chromahtml.WithLineNumbers(true),
+					),
+				),
 			),
 			goldmark.WithRendererOptions(
 				html.WithUnsafe(),
 			),
 		)
 
-		type Post struct {
-			PostTitle string
-			PostPath  string
-		}
-
-		var postsWithMeta []Post
+		var postsWithMeta []utils.Post
 
 		posts, _ := os.ReadDir("posts")
 		for _, post := range posts {
@@ -107,7 +110,10 @@ var buildCommand = &cobra.Command{
 
 			f := frontmatter.Get(ctx)
 			var meta struct {
-				Title string `yaml:"title"`
+				Title       string `yaml:"title"`
+				Description string `yaml:"description"`
+				Date        string `yaml:"date"`
+				Author      string `yaml:"author"`
 			}
 
 			err = f.Decode(&meta)
@@ -152,9 +158,12 @@ var buildCommand = &cobra.Command{
 			}
 			defer outFile.Close()
 
-			postsWithMeta = append(postsWithMeta, Post{
-				PostTitle: meta.Title,
-				PostPath:  "/posts/" + outputFilename,
+			postsWithMeta = append(postsWithMeta, utils.Post{
+				PostTitle:   meta.Title,
+				PostPath:    "/posts/" + outputFilename,
+				Author:      meta.Author,
+				Date:        meta.Date,
+				Description: meta.Description,
 			})
 
 			log.Printf("Successfully built post '%s'.\n", post.Name())
@@ -178,7 +187,7 @@ var buildCommand = &cobra.Command{
 		data := struct {
 			PostTitle string
 			SiteTitle string
-			Posts     []Post
+			Posts     []utils.Post
 			Copyright string
 		}{
 			PostTitle: "Home",
@@ -205,11 +214,24 @@ var buildCommand = &cobra.Command{
 		// copy public assets
 		_, err = os.Stat("public")
 		if err == nil {
-			err = utils.CopyDirectory("public", path.Join("dist", "public"))
+			err = utils.CopyDirectory("public", "dist")
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
+		}
+
+		rssFeedXML, err := utils.GenerateRSS(postsWithMeta, "", config.Site.Title, "")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error generating RSS feed: %v\n", err)
+			return
+		}
+		rssOutputFilename := "rss.xml"
+		rssOutputFilepath := path.Join("dist", rssOutputFilename)
+		err = os.WriteFile(rssOutputFilepath, []byte(rssFeedXML), 0644)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error writing RSS feed to file: %v\n", err)
+			return
 		}
 
 		log.Println("Successfully built all posts.")

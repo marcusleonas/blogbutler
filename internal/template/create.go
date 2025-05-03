@@ -6,6 +6,9 @@ import (
 	"path"
 )
 
+//go:embed defaults.css
+var DefaultCSS string
+
 //go:embed home.html
 var HomeTemplate string
 

@@ -52,6 +52,14 @@ var initCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
+		f, err := os.Create(path.Join(folderName, "public", "styles.css"))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		f.WriteString(template.DefaultCSS)
+
 		err = config.CreateConfig(folderName)
 		if err != nil {
 			fmt.Println(err)

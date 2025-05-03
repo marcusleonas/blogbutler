@@ -1,6 +1,8 @@
 {{ define "content" }}
 <h1>{{ .SiteTitle }}</h1>
-{{ range .Posts }}
-<a href="{{ .PostPath }}">{{ .PostTitle }}</a>
-{{ end }}
+<ul>
+    {{ range .Posts }}
+    <li><a href="{{ .PostPath }}">{{ .PostTitle }}</a></li>
+    {{ end }}
+</ul>
 {{ end }}

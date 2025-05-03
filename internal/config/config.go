@@ -13,6 +13,7 @@ type SiteConfig struct {
 	Title      string `toml:"title"`
 	PostFolder string `toml:"post_folder"`
 	Copyright  string `toml:"copyright"`
+	Locale     string `toml:"locale"`
 }
 
 type Config struct {
@@ -25,6 +26,7 @@ const defaultConfigContent = `# docs: https://github.com/marcusleonas/blogbutler
 title = "My Default Blog Title"
 post_folder = "posts"
 copyright = "© 2025 Your Name Here"
+locale = "en-gb"
 `
 
 func CreateConfig(folder string) error {
