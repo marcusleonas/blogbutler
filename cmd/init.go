@@ -46,6 +46,12 @@ var initCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
+		err = os.Mkdir(path.Join(folderName, "public"), 0777)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
 		err = config.CreateConfig(folderName)
 		if err != nil {
 			fmt.Println(err)
