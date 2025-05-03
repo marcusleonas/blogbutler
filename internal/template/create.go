@@ -19,5 +19,12 @@ func CreateTemplates(folderName string) error {
 	}
 	defer layoutTemplate.Close()
 	layoutTemplate.WriteString(LayoutTemplate)
+
+	PostTemplate, err := os.Create(path.Join(folderName, "templates", "post.html"))
+	if err != nil {
+		return err
+	}
+	defer PostTemplate.Close()
+	PostTemplate.WriteString(PostsTemplate)
 	return nil
 }

@@ -25,6 +25,11 @@ var initCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if len(args) == 0 {
+			fmt.Println("Please provide a folder name")
+			os.Exit(1)
+		}
+
 		folderName := args[0]
 		postFolder := "posts"
 		templatesFolder := "templates"

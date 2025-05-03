@@ -1,11 +1,21 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
+	"log"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/marcusleonas/blogbutler/internal/config"
 	"github.com/spf13/cobra"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
+	"go.abhg.dev/goldmark/frontmatter"
 )
 
 func init() {
@@ -17,12 +27,121 @@ var buildCommand = &cobra.Command{
 	Short: "Build your posts to html",
 	Long:  "Build all posts to html",
 	Run: func(cmd *cobra.Command, args []string) {
-		exists := config.ConfigExists()
-		if !exists {
+		confExists := config.ConfigExists()
+		if !confExists {
 			fmt.Println("No blogbutler config file found. Run `blogbutler init` to create one.")
 			os.Exit(1)
 		}
 
-		fmt.Println("build command ran")
+		config := config.LoadConfig()
+
+		_, err := os.Stat(config.Site.PostFolder)
+		if err != nil {
+			fmt.Println("No posts folder found. Run `blogbutler init` to create one.")
+			os.Exit(1)
+		}
+
+		_, err = os.Stat("dist")
+		if err == nil {
+			nErr := os.RemoveAll("dist")
+			if nErr != nil {
+				fmt.Println(nErr)
+				os.Exit(1)
+			}
+		}
+
+		err = os.Mkdir("dist", 0755)
+		if err != nil {
+			fmt.Println("Failed to create dist folder.")
+			os.Exit(1)
+		}
+
+		md := goldmark.New(
+			goldmark.WithExtensions(
+				extension.GFM,
+				extension.Footnote,
+				&frontmatter.Extender{},
+			),
+			goldmark.WithRendererOptions(
+				html.WithUnsafe(),
+			),
+		)
+
+		posts, _ := os.ReadDir("posts")
+		for _, post := range posts {
+			if post.IsDir() || !strings.HasSuffix(post.Name(), ".md") {
+				continue
+			}
+
+			fmt.Printf("Building post '%s'...\n", post.Name())
+
+			postFilePath := path.Join("posts", post.Name())
+			file, err := os.ReadFile(postFilePath)
+			if err != nil {
+				log.Printf("Error reading post file %s: %v. Skipping.", postFilePath, err)
+				continue
+			}
+
+			ctx := parser.NewContext()
+
+			var buf bytes.Buffer
+			if err := md.Convert(file, &buf, parser.WithContext(ctx)); err != nil {
+				log.Printf("Error converting markdown: %v. Skipping.", postFilePath)
+				continue
+			}
+			htmlOutput := buf.Bytes()
+
+			f := frontmatter.Get(ctx)
+			var meta struct {
+				Title string `yaml:"title"`
+			}
+
+			err = f.Decode(&meta)
+			if err != nil {
+				fmt.Printf("Error decoding frontmatter in '%s'. Required frontmatter probably does not exist.", postFilePath)
+				continue
+			}
+
+			layoutTemplate := "templates/layout.html"
+			postTemplate := "templates/post.html"
+
+			outputFilename := strings.Trim(post.Name(), ".md")
+			outputFilepath := path.Join("dist", outputFilename+".html")
+
+			tmpl, err := template.ParseFiles(layoutTemplate, postTemplate)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			data := struct {
+				SiteTitle   string
+				PostTitle   string
+				PostContent template.HTML
+				Copyright   string
+			}{
+				SiteTitle:   config.Site.Title,
+				PostTitle:   meta.Title,
+				PostContent: template.HTML(htmlOutput),
+				Copyright:   config.Site.Copyright,
+			}
+
+			outFile, err := os.Create(outputFilepath)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			err = tmpl.ExecuteTemplate(outFile, "layout", data)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			defer outFile.Close()
+
+			log.Printf("Successfully built post '%s'.\n", post.Name())
+		}
+
+		log.Println("Successfully built all posts.")
 	},
 }
