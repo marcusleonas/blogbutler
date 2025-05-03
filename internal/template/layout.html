@@ -1,19 +1,4 @@
-package template
-
-var HomeTemplate = `{{ define "content" }}
-<h1>{{ .SiteTitle }}</h1>
-{{ range .Posts }}
-<a href="{{ .PostPath }}">{{ .PostTitle }}</a>
-{{ end }}
-{{ end }}`
-
-var PostsTemplate = `{{ define "content" }}
-<a href="/">Back to home</a>
-<h1>{{ .PostTitle }}</h1>
-{{ .PostContent }}
-{{ end }}`
-
-var LayoutTemplate = `{{ define "layout" }}
+{{ define "layout" }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,4 +15,4 @@ var LayoutTemplate = `{{ define "layout" }}
     </footer>
 </body>
 </html>
-{{ end }}`
+{{ end }}

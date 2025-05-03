@@ -1,9 +1,19 @@
 package template
 
 import (
+	_ "embed"
 	"os"
 	"path"
 )
+
+//go:embed home.html
+var HomeTemplate string
+
+//go:embed post.html
+var PostsTemplate string
+
+//go:embed layout.html
+var LayoutTemplate string
 
 func CreateTemplates(folderName string) error {
 	homeTemplate, err := os.Create(path.Join(folderName, "templates", "home.html"))
