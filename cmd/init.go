@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/marcusleonas/blogbutler/internal/config"
+	"github.com/marcusleonas/blogbutler/internal/template"
 	"github.com/spf13/cobra"
 )
 
@@ -25,14 +26,28 @@ var initCommand = &cobra.Command{
 		}
 
 		folderName := args[0]
-		postFolder := path.Join(folderName, "posts")
-		err := os.MkdirAll(postFolder, 0777)
+		postFolder := "posts"
+		templatesFolder := "templates"
+
+		err := os.MkdirAll(path.Join(folderName, postFolder), 0777)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		err = os.Mkdir(path.Join(folderName, templatesFolder), 0777)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
 		err = config.CreateConfig(folderName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		err = template.CreateTemplates(folderName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
