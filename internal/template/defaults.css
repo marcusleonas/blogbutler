@@ -1,5 +1,7 @@
 :root {
+    --background: #0f0f0f;
     --muted: #c3c3c3;
+    --link-hover: #cbe3fe;
 }
 
 *, *::before, *::after {
@@ -7,7 +9,7 @@
 }
 
 html, body {
-    background-color: #131313;
+    background-color: var(--background);
     color: #fff;
 }
 
@@ -60,7 +62,7 @@ a {
 }
 
 a:hover {
-    color: var(--muted);
+    color: var(--link-hover);
 }
 
 blockquote {
