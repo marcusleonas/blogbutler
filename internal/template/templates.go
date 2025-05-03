@@ -1,5 +1,9 @@
 package template
 
+var HomeTemplate = `{{ define "content" }}
+<h1>{{ .SiteTitle }}</h1>
+{{ end }}`
+
 var LayoutTemplate = `{{ define "layout" }}
 <!DOCTYPE html>
 <html lang="en">
