@@ -1,7 +1,7 @@
 :root {
     --background: #0f0f0f;
     --muted: #c3c3c3;
-    --link-hover: #cbe3fe;
+    --accent: #cbe3fe;
 }
 
 *, *::before, *::after {
@@ -62,11 +62,11 @@ a {
 }
 
 a:hover {
-    color: var(--link-hover);
+    color: var(--accent);
 }
 
 blockquote {
-    border-left: 4px solid var(--muted);
+    border-left: 4px solid var(--accent);
     padding-left: 1rem;
     margin-left: 1rem;
 }
@@ -80,14 +80,15 @@ table {
     width: 100%;
 }
 table, th, td {
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--accent);
 }
 th, td {
     padding: 0.75rem;
     vertical-align: top;
 }
 th {
-    background-color: #e9ecef;
+    background-color: var(--accent);
+    color: black;
 }  
 
 img {
